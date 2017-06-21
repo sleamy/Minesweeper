@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Random;
 
 import javax.swing.JPanel;
@@ -10,7 +12,7 @@ public class Display extends JPanel {
 		
 	public static final int TILESIZE = 40;
 	public static final int BOMBTOKEN = 9;
-	public static int width = 8, height = 8;
+	public static int width = 20, height = 8;
 	public static int numOfBombs = 10;
 	public int[][] board = new int[width][height];
 	public int[][] revealed = new int[width][height];
@@ -24,12 +26,13 @@ public class Display extends JPanel {
 		random = new Random();
 		
 		initBoard();
+		addListeners();
+		
 	}
 	
 	public void initBoard() {
 		placeBombs();
 		setNumbers();
-		displayBoardInConsole();
 	}
 	
 	public void placeBombs() {
@@ -45,7 +48,6 @@ public class Display extends JPanel {
 				bombsPlaced++;
 			}
 		}
-		
 		
 	}
 	
@@ -111,11 +113,16 @@ public class Display extends JPanel {
 		
 		for(int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
-				System.out.print(board[row][col]);
+				System.out.print(board[col][row]);
 			}
 			System.out.println();
 		}
 		
+	}
+	
+	public void reveal(int x, int y) {
+		revealed[x][y] = board[x][y];
+		repaint();
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -124,22 +131,52 @@ public class Display extends JPanel {
 		
 		for(int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
-				if(board[row][col] == BOMBTOKEN) {
+				if(revealed[col][row] == BOMBTOKEN) {
 					g.setColor(Color.RED);
-					g.fillRect(row * TILESIZE, col * TILESIZE, TILESIZE, TILESIZE);
+					g.fillRect(col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE);
 					g.setColor(Color.BLACK);
-					g.drawRect(row * TILESIZE, col * TILESIZE, TILESIZE, TILESIZE);
+					g.drawRect(col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE);
 				} else {
 					g.setColor(Color.LIGHT_GRAY);
-					g.fillRect(row * TILESIZE, col * TILESIZE, TILESIZE, TILESIZE);
+					g.fillRect(col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE);
 					g.setColor(Color.BLACK);
-					g.drawRect(row * TILESIZE, col * TILESIZE, TILESIZE, TILESIZE);
-					g.drawString(Integer.toString(board[row][col]), (row * TILESIZE) + 17, (col * TILESIZE) + 25);
+					g.drawRect(col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE);
+					//g.drawString(Integer.toString(board[col][row]), (col * TILESIZE) + 17, (row * TILESIZE) + 25);
 				}
 			}
 		}
+	}
+	
+	public void addListeners() {
 		
+		this.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				reveal(e.getX() / 40, e.getY() / 40);
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				
+			}
 		
+		});
 	}
 	
 }
