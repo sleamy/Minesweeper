@@ -7,19 +7,19 @@ import javax.swing.JPanel;
 
 
 public class Display extends JPanel {
-
+		
 	public static final int TILESIZE = 40;
 	public static final int BOMBTOKEN = 9;
 	public static int width = 8, height = 8;
 	public static int numOfBombs = 10;
 	public int[][] board = new int[width][height];
+	public int[][] revealed = new int[width][height];
 	
 	public Random random;
 	
 	public Display() {
 	
 		this.setPreferredSize(new Dimension((width * TILESIZE) + 1, (height * TILESIZE) + 1));
-		System.out.println("height: " + height * TILESIZE + ", width: " + width * TILESIZE);
 		
 		random = new Random();
 		
@@ -53,7 +53,6 @@ public class Display extends JPanel {
 		
 		for(int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
-				System.out.println("Row: " + row + ", Col: " + col);
 				if(board[col][row] != BOMBTOKEN)
 					board[col][row] = countNearbyBombs(col, row);
 			}
@@ -62,8 +61,6 @@ public class Display extends JPanel {
 	}
 	
 	public int countNearbyBombs(int x, int y) {
-		
-		System.out.println(x + ", " + y);
 		
 		int nearbyBombs = 0;
 		
