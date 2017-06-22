@@ -11,6 +11,8 @@ public class Images {
 	public static BufferedImage pressed;
 	public static BufferedImage mine;
 	public static BufferedImage flag;
+	public static BufferedImage cross;
+	public static BufferedImage clickedMine;
 	public static BufferedImage one;
 	public static BufferedImage two;
 	public static BufferedImage three;
@@ -28,11 +30,14 @@ public class Images {
 	}
 	
 	public void loadImages() {
+		
 		try {
 			unpressed = ImageIO.read(new File("res/blank_128.png"));
 			pressed = ImageIO.read(new File("res/pressed_128.png"));
 			mine = ImageIO.read(new File("res/mine_128.png"));
 			flag = ImageIO.read(new File("res/flag_128.png"));
+			cross = ImageIO.read(new File("res/cross_32.png"));
+			clickedMine = ImageIO.read(new File("res/clicked_mine_32.png"));
 			one = ImageIO.read(new File("res/one_128.png"));
 			two = ImageIO.read(new File("res/two_128.png"));
 			three = ImageIO.read(new File("res/three_128.png"));
