@@ -14,29 +14,28 @@ public class Display extends JPanel {
 		
 	public static final int TILESIZE = 32;
 	public static final int MINETOKEN = 9;
-	public static int width = 8, height = 8;
+	public static int width = 9, height = 9;
 	public static int numOfMines = 10;
-	
-	// Change these to array of tiles or figure out how to use revealed for flags
+
 	public int[][] board = new int[width][height];
 	public int[][] revealed = new int[width][height];
 	
-	public Random random;
-	
+	public Random random;	
 	public Images images;
 	
 	public Display() {
-	
-		this.setPreferredSize(new Dimension((width * TILESIZE), (height * TILESIZE)));
 		
-		random = new Random();
-		
-		images = new Images();
-		
+		init();
 		initBoard();
 		addListeners();
-
-		System.out.println("Width: " + (width * TILESIZE)+ ", Height: " + (height * TILESIZE));
+	}
+	
+	public void init() {
+		
+		this.setPreferredSize(new Dimension((width * TILESIZE), (height * TILESIZE)));		
+		random = new Random();		
+		images = new Images();
+		
 	}
 	
 	public void initBoard() {
@@ -149,15 +148,18 @@ public class Display extends JPanel {
 	}
 	
 	public void reveal(int x, int y) {
-		System.out.println("Board[x][y] = " + board[x][y] + ", revealed[x][y] = " + revealed[x][y]);
 		revealed[x][y] = board[x][y];
 		repaint();
 	}
 	
 	public void paintComponent(Graphics g) {
-		
-		g.fillRect(0, 0, width * TILESIZE, height * TILESIZE);
+
 		g.setFont(new Font("Courier", Font.BOLD, 20));
+		clear(g);
+		paintBoard(g);
+	}
+	
+	public void paintBoard(Graphics g) {
 		
 		for(int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
@@ -203,6 +205,12 @@ public class Display extends JPanel {
 		}
 	}
 	
+	
+	public void clear(Graphics g) {
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width * TILESIZE, height * TILESIZE);
+	}
+	
 	public void addListeners() {
 		
 		this.addMouseListener(new MouseListener() {
@@ -219,7 +227,6 @@ public class Display extends JPanel {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				System.out.println("X: " + e.getX() + ", Y: " + e.getY());
 				reveal(e.getX() / TILESIZE, e.getY() / TILESIZE);
 			}
 
