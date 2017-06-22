@@ -12,13 +12,13 @@ import javax.swing.SwingUtilities;
 
 public class Display extends JPanel {
 
-
 	public static final int MINETOKEN = 9;
 	public static final int FLAGTOKEN = -2;
 	public static final int CLICKEDMINE = -3;
 	public static final int CROSSTOKEN = -4;
-	
-	public static final int TILESIZE = 32;
+
+	public static final int SCALE = 2;
+	public static final int TILESIZE = 16 * SCALE;
 	public static int width = 9, height = 9;
 	public static int numOfMines = 10;
 
@@ -177,6 +177,84 @@ public class Display extends JPanel {
 		return nearbyMines;
 	}
 
+	public void revealBlank(int x, int y) {
+
+		revealed[x][y] = board[x][y];
+		
+		// check top
+		if (y > 0) {
+			if (board[x][y - 1] == 0 && revealed[x][y - 1] != 0) {
+				revealBlank(x, y - 1);
+			} else if(board[x][y - 1] > 0 && revealed[x][y - 1] == -1) {
+				revealed[x][y - 1] = board[x][y - 1];
+			}
+		}
+
+		// check top-right
+		if (y > 0 && x < width - 1) {
+			if (board[x + 1][y - 1] == 0 && revealed[x + 1][y - 1] != 0) {
+				revealBlank(x + 1, y - 1);
+			} else if(board[x + 1][y - 1] > 0 && revealed[x + 1][y - 1] == -1) {
+				revealed[x + 1][y - 1] = board[x + 1][y - 1];
+			}
+		}
+
+		// check right
+		if (x < width - 1) {
+			if (board[x + 1][y] == 0 && revealed[x + 1][y] != 0) {
+				revealBlank(x + 1, y);
+			} else if(board[x + 1][y] > 0 && revealed[x + 1][y] == -1) {
+				revealed[x + 1][y] = board[x + 1][y];
+			}
+		}
+
+		// check bottom-right
+		if (x < width - 1 && y < height - 1) {
+			if (board[x + 1][y + 1] == 0 && revealed[x + 1][y + 1] != 0) {
+				revealBlank(x + 1, y + 1);
+			} else if(board[x + 1][y + 1] > 0 && revealed[x + 1][y + 1] == -1) {
+				revealed[x + 1][y + 1] = board[x + 1][y + 1];
+			}
+		}
+
+		// check bottom
+		if (y < height - 1) {
+			if (board[x][y + 1] == 0 && revealed[x][y + 1] != 0) {
+				revealBlank(x, y + 1);
+			} else if(board[x][y + 1] > 0 && revealed[x][y + 1] == -1) {
+				revealed[x][y + 1] = board[x][y + 1];
+			}
+		}
+
+		// check bottom-left
+		if (x > 0 && y < height - 1) {
+			if (board[x - 1][y + 1] == 0 && revealed[x - 1][y + 1] != 0) {
+				revealBlank(x - 1, y + 1);
+			} else if(board[x - 1][y + 1] > 0 && revealed[x - 1][y + 1] == -1) {
+				revealed[x - 1][y + 1] = board[x - 1][y + 1];
+			}
+		}
+
+		// check left
+		if (x > 0) {
+			if (board[x - 1][y] == 0 && revealed[x - 1][y] != 0) {
+				revealBlank(x - 1, y);
+			} else if(board[x - 1][y] > 0 && revealed[x - 1][y] == -1) {
+				revealed[x - 1][y] = board[x - 1][y];
+			}
+		}
+
+		// check top-left
+		if (x > 0 && y > 0) {
+			if (board[x - 1][y - 1] == 0 && revealed[x - 1][y - 1] != 0) {
+				revealBlank(x - 1, y - 1);
+			} else if(board[x - 1][y - 1] > 0 && revealed[x - 1][y - 1] == -1) {
+				revealed[x - 1][y - 1] = board[x - 1][y - 1];
+			}
+		}
+
+	}
+
 	public void displayBoardInConsole() {
 
 		for (int col = 0; col < width; col++) {
@@ -229,7 +307,12 @@ public class Display extends JPanel {
 		} else if (revealed[x][y] == FLAGTOKEN) {
 			return;
 		} else if (revealed[x][y] == -1) {
-			revealed[x][y] = board[x][y];
+			if (board[x][y] == 0) {
+				revealBlank(x, y);
+			} else {
+				revealed[x][y] = board[x][y];
+			}
+
 		}
 
 		repaint();
@@ -372,12 +455,14 @@ public class Display extends JPanel {
 
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = false;
-						if (inWindow(x, y)) reveal(x, y);
+						if (inWindow(x, y))
+							reveal(x, y);
 					} else if (SwingUtilities.isMiddleMouseButton(e)) {
 						middleMousePressed = false;
 					} else if (SwingUtilities.isRightMouseButton(e)) {
 						rightMousePressed = false;
-						if (inWindow(x, y)) flag(x, y);
+						if (inWindow(x, y))
+							flag(x, y);
 					}
 				}
 			}
