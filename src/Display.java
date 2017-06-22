@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 
 public class Display extends JPanel {
@@ -22,6 +23,10 @@ public class Display extends JPanel {
 	
 	public Random random;	
 	public Images images;
+	
+	public boolean leftMousePressed = false;
+	public boolean middleMousePressed = false;
+	public boolean rightMousePressed = false;
 	
 	public Display() {
 		
@@ -182,6 +187,15 @@ public class Display extends JPanel {
 		repaint();
 	}
 	
+	public void flag(int x, int y) {
+		if(revealed[x][y] == -1) {
+			revealed[x][y] = -2;
+		} else if (revealed[x][y] == -2) {
+			revealed[x][y] = -1;
+		}
+		repaint();
+	}
+	
 	public void paintComponent(Graphics g) {
 
 		g.setFont(new Font("Courier", Font.BOLD, 20));
@@ -250,6 +264,20 @@ public class Display extends JPanel {
 		g.fillRect(0, 0, width * TILESIZE, height * TILESIZE);
 	}
 	
+	/**
+	 * Determines if the position of a click is within the 
+	 * bounds of the window.
+	 * 
+	 * @param x		The x position of the click.
+	 * @param y		The y position of the click.
+	 * @return		If the coords of the click are within
+	 * 				the window, return true. Otherwise 
+	 * 				return false.
+	 */
+	public boolean inWindow(int x, int y) {		
+		return ((x > 0 && x < width) && (y > 0 && y < height)) ? true : false;
+	}
+	
 	public void addListeners() {
 		
 		this.addMouseListener(new MouseListener() {
@@ -261,12 +289,30 @@ public class Display extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					leftMousePressed = true;
+				} else if(SwingUtilities.isMiddleMouseButton(e)) {
+					middleMousePressed = true;
+				} else if(SwingUtilities.isRightMouseButton(e)) {
+					rightMousePressed = true;
+				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				reveal(e.getX() / TILESIZE, e.getY() / TILESIZE);
+				
+				int x = e.getX() / TILESIZE;
+				int y = e.getY() / TILESIZE;
+				
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					leftMousePressed = false;
+					if(inWindow(x, y)) reveal(x, y);
+				} else if(SwingUtilities.isMiddleMouseButton(e)) {
+					middleMousePressed = false;
+				} else if(SwingUtilities.isRightMouseButton(e)) {
+					rightMousePressed = false;
+					if(inWindow(x, y)) flag(x, y);
+				}
 			}
 
 			@Override
