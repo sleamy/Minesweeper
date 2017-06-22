@@ -39,19 +39,24 @@ public class Display extends JPanel {
 	}
 	
 	public void initBoard() {
-		setRevealed();
-		placeMines();
+		initRevealed();
+		placeMines(numOfMines);
 		setNumbers();
 		System.out.println("Game is setup!");
 	}
 	
-	public void setRevealed() {
+	
+	/**
+	 * 	Initialises all elements of the revealed array to -1.
+	 */
+	public void initRevealed() {
 		for(int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
 				revealed[col][row] = -1;
 			}
 		}
 	}
+	
 	
 	public void fillBoard() {
 		for(int col = 0; col < width; col++) {
@@ -62,11 +67,16 @@ public class Display extends JPanel {
 		}
 	}
 	
-	public void placeMines() {
+	/**
+	 * Places n mines randomly on the grid.
+	 * 
+	 * @param n	The number of mines to be placed.
+	 */
+	public void placeMines(int n) {
 		
 		int minesPlaced = 0;
 		
-		while(minesPlaced < numOfMines) {
+		while(minesPlaced < n) {
 			int x = random.nextInt(width);
 			int y = random.nextInt(height);
 			
@@ -78,6 +88,10 @@ public class Display extends JPanel {
 		
 	}
 	
+	/**
+	 * Counts the number of mines surrounding each tile and allocates
+	 * that number to each tile.
+	 */
 	public void setNumbers() {
 		
 		for(int col = 0; col < width; col++) {
@@ -89,6 +103,14 @@ public class Display extends JPanel {
 		
 	}
 	
+	/**
+	 * For a specific tile, checks the surrounding tiles for mines
+	 * and returns the number of mines found.
+	 * 
+	 * @param x		The x position of the specified tile.
+	 * @param y		The y position of the specified tile.
+	 * @return		The number of mines found.
+	 */
 	public int countNearbyMines(int x, int y) {
 		
 		int nearbyMines = 0;
@@ -147,6 +169,14 @@ public class Display extends JPanel {
 		
 	}
 	
+	/**
+	 * Changes the tile at location (x, y) in the revealed array
+	 * to be the same as the value in the board array then repaint
+	 * the board on screen.
+	 * 
+	 * @param x		The x position of the tile that was clicked on.
+	 * @param y		The y position of the tile that was clicked on.
+	 */
 	public void reveal(int x, int y) {
 		revealed[x][y] = board[x][y];
 		repaint();
@@ -159,6 +189,11 @@ public class Display extends JPanel {
 		paintBoard(g);
 	}
 	
+	/**
+	 * Draws an image corresponding to the values of the revealed array.
+	 * 
+	 * @param g		The Graphics object.
+	 */
 	public void paintBoard(Graphics g) {
 		
 		for(int col = 0; col < width; col++) {
@@ -205,7 +240,11 @@ public class Display extends JPanel {
 		}
 	}
 	
-	
+	/**
+	 * Fills the screen with a black rectangle.
+	 * 
+	 * @param g
+	 */
 	public void clear(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width * TILESIZE, height * TILESIZE);
