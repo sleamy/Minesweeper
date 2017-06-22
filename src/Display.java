@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.DecimalFormat;
 import java.util.Random;
 
 import javax.swing.JPanel;
@@ -13,16 +14,22 @@ import javax.swing.SwingUtilities;
 
 public class Display extends JPanel {
 
+	public static final int SCALE = 2;
+	
 	public static final int MINETOKEN = 9;
 	public static final int FLAGTOKEN = -2;
 	public static final int CLICKEDMINE = -3;
 	public static final int CROSSTOKEN = -4;
-
-	public static final int SCALE = 2;
+	
+	public static final int PADDING = 2 * SCALE;
+	public static final int BORDERSIZE = 10 * SCALE;
+	public static final int TOPHEIGHT = 50 * SCALE;
 	public static final int TILESIZE = 16 * SCALE;
 	public static int width = 9, height = 9;
 	public static int numOfMines = 10;
 	public static int flagsRemaining = numOfMines;
+	
+	public DecimalFormat df = new DecimalFormat("000");
 
 	public int[][] board = new int[width][height];
 	public int[][] revealed = new int[width][height];
@@ -45,7 +52,7 @@ public class Display extends JPanel {
 	}
 
 	public void init() {
-		this.setPreferredSize(new Dimension((width * TILESIZE), (height * TILESIZE)));
+		this.setPreferredSize(new Dimension((width * TILESIZE + (BORDERSIZE * 2)), (height * TILESIZE)  + (TOPHEIGHT + BORDERSIZE)));
 		random = new Random();
 		images = new Images();
 	}
@@ -60,6 +67,7 @@ public class Display extends JPanel {
 	
 	public void reset() {
 		setupBoard();
+		flagsRemaining = numOfMines;
 		gameOver = false;
 		repaint();
 		System.out.println("Game reset!");
@@ -343,9 +351,7 @@ public class Display extends JPanel {
 			} else {
 				revealed[x][y] = board[x][y];
 			}
-
 		}
-
 		repaint();
 	}
 
@@ -359,18 +365,97 @@ public class Display extends JPanel {
 		}
 		repaint();
 	}
+	
+	public void complete(int x, int y) {
+		
+	}
 
 	public void gameOver() {
 		gameOver = true;
 		System.out.println("You lose!");
 	}
-
+	
+	/*
+	 * 		EVERYTHING BELOW HERE IS FOR DRAWING
+	 */
+	
 	public void paintComponent(Graphics g) {
 
 		g.setFont(new Font("Courier", Font.BOLD, 20));
 
 		clear(g);
+		paintTop(g);
 		paintBoard(g);
+		drawBorders(g);
+	}
+
+	/**
+	 * Fills the screen with a grey rectangle.
+	 * 
+	 * @param g
+	 */
+	public void clear(Graphics g) {
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(0, 0, width * TILESIZE + (BORDERSIZE * 2), height * TILESIZE + (TOPHEIGHT + BORDERSIZE));
+	}
+	
+	public void drawBorders(Graphics g) {
+		
+		drawTopBorder(g);	
+		drawMainBorder(g);
+		drawApplicationBorder(g);
+	}
+	
+	public void drawTopBorder(Graphics g) {
+		g.setColor(Color.GRAY);
+		g.fillRect(BORDERSIZE - PADDING, BORDERSIZE, width * TILESIZE + PADDING, PADDING);
+		g.fillRect(BORDERSIZE - PADDING, BORDERSIZE, PADDING, TOPHEIGHT - (BORDERSIZE * 2));
+		g.setColor(Color.WHITE);
+		g.fillRect(BORDERSIZE, BORDERSIZE + (TOPHEIGHT - (BORDERSIZE * 2) - PADDING), width * TILESIZE + PADDING, PADDING);
+		g.fillRect(BORDERSIZE + (width * TILESIZE), BORDERSIZE, PADDING, TOPHEIGHT - (BORDERSIZE * 2));
+	}
+	
+	public void drawMainBorder(Graphics g) {
+		g.setColor(Color.GRAY);
+		g.fillRect(BORDERSIZE - PADDING, TOPHEIGHT - PADDING, width * TILESIZE + PADDING, PADDING);
+		g.fillRect(BORDERSIZE - PADDING, TOPHEIGHT - PADDING, PADDING, height * TILESIZE + (PADDING * 2));
+		g.setColor(Color.WHITE);
+		g.fillRect(BORDERSIZE, TOPHEIGHT + (TILESIZE * height), width * TILESIZE + PADDING, PADDING); 
+		g.fillRect(BORDERSIZE + (width * TILESIZE), TOPHEIGHT - PADDING, PADDING, height * TILESIZE + PADDING);
+	}
+	
+	public void drawApplicationBorder(Graphics g) {
+		g.setColor(Color.GRAY);
+		g.fillRect(0 + PADDING, this.getHeight() - PADDING, this.getWidth(), PADDING);
+		g.fillRect(this.getWidth() - PADDING, 0, PADDING, this.getHeight());
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, this.getWidth(), PADDING);
+		g.fillRect(0, 0, PADDING, this.getHeight());
+	}
+	
+	public void paintTop(Graphics g) {
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(BORDERSIZE, BORDERSIZE, width * TILESIZE, TOPHEIGHT - (BORDERSIZE * 2));
+		
+		g.setFont(new Font("Arial", Font.BOLD, 42));
+		drawFlagsBox(g);
+		drawTimerBox(g);
+	}
+	
+	public void drawFlagsBox(Graphics g) {
+		g.setColor(Color.BLACK);
+		g.fillRect(BORDERSIZE + (BORDERSIZE / 2) - PADDING, BORDERSIZE + (BORDERSIZE / 2), 80, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
+		g.setColor(Color.RED);
+		g.drawString(df.format(flagsRemaining), BORDERSIZE + (BORDERSIZE / 2), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
+	}
+	
+	public void drawTimerBox(Graphics g) {
+		g.setColor(Color.BLACK);
+		g.fillRect(this.getWidth() - BORDERSIZE - PADDING * 2, BORDERSIZE + (BORDERSIZE / 2), -80, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
+	}
+	
+	public void drawResetButton(Graphics g) {
+		g.setColor(Color.BLACK);
 	}
 
 	/**
@@ -385,46 +470,46 @@ public class Display extends JPanel {
 			for (int row = 0; row < height; row++) {
 				switch (revealed[col][row]) {
 				case MINETOKEN:
-					g.drawImage(Images.mine, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.mine, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 1:
-					g.drawImage(Images.one, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.one, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 2:
-					g.drawImage(Images.two, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.two, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 3:
-					g.drawImage(Images.three, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.three, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 4:
-					g.drawImage(Images.four, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.four, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 5:
-					g.drawImage(Images.five, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.five, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 6:
-					g.drawImage(Images.six, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.six, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 7:
-					g.drawImage(Images.seven, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.seven, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 8:
-					g.drawImage(Images.eight, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.eight, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case 0:
-					g.drawImage(Images.pressed, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.pressed, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case -1:
-					g.drawImage(Images.unpressed, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.unpressed, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case FLAGTOKEN:
-					g.drawImage(Images.flag, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.flag, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case CLICKEDMINE:
-					g.drawImage(Images.clickedMine, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.clickedMine, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				case CROSSTOKEN:
-					g.drawImage(Images.cross, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.cross, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
 					break;
 				default:
 					// Nothing.
@@ -434,25 +519,16 @@ public class Display extends JPanel {
 	}
 
 	/**
-	 * Fills the screen with a black rectangle.
-	 * 
-	 * @param g
-	 */
-	public void clear(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, width * TILESIZE, height * TILESIZE);
-	}
-
-	/**
 	 * Determines if the position of a click is within the bounds of the window.
 	 * 
-	 * @param x
-	 *            The x position of the click.
-	 * @param y
-	 *            The y position of the click.
-	 * @return If the coords of the click are within the window, return true.
-	 *         Otherwise return false.
+	 * @param x		The x position of the click.
+	 *            
+	 * @param y		The y position of the click.
+	 *            
+	 * @return		If the coords of the click are within the window, return true.
+	 *         	  	Otherwise return false.
 	 */
+	
 	public boolean inWindow(int x, int y) {
 		return ((x >= 0 && x < width) && (y >= 0 && y < height)) ? true : false;
 	}
@@ -503,8 +579,8 @@ public class Display extends JPanel {
 			public void mouseReleased(MouseEvent e) {
 
 				if (!gameOver) {
-					int x = e.getX() / TILESIZE;
-					int y = e.getY() / TILESIZE;
+					int x = (e.getX() - BORDERSIZE) / TILESIZE;
+					int y = (e.getY() - TOPHEIGHT) / TILESIZE;
 
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = false;
@@ -512,6 +588,7 @@ public class Display extends JPanel {
 							reveal(x, y);
 					} else if (SwingUtilities.isMiddleMouseButton(e)) {
 						middleMousePressed = false;
+							complete(x, y);
 					} else if (SwingUtilities.isRightMouseButton(e)) {
 						rightMousePressed = false;
 						if (inWindow(x, y))
