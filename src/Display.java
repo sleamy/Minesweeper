@@ -2,9 +2,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import javax.swing.JPanel;
@@ -21,6 +22,7 @@ public class Display extends JPanel {
 	public static final int TILESIZE = 16 * SCALE;
 	public static int width = 9, height = 9;
 	public static int numOfMines = 10;
+	public static int flagsRemaining = numOfMines;
 
 	public int[][] board = new int[width][height];
 	public int[][] revealed = new int[width][height];
@@ -35,24 +37,40 @@ public class Display extends JPanel {
 
 	public Display() {
 
+		this.setFocusable(true);
+		
 		init();
-		initBoard();
+		setupBoard();
 		addListeners();
 	}
 
 	public void init() {
-
 		this.setPreferredSize(new Dimension((width * TILESIZE), (height * TILESIZE)));
 		random = new Random();
 		images = new Images();
-
 	}
 
-	public void initBoard() {
+	public void setupBoard() {
+		initBoard();
 		initRevealed();
 		placeMines(numOfMines);
 		setNumbers();
 		System.out.println("Game is setup!");
+	}
+	
+	public void reset() {
+		setupBoard();
+		gameOver = false;
+		repaint();
+		System.out.println("Game reset!");
+	}
+	
+	public void initBoard() {
+		for (int col = 0; col < width; col++) {
+			for (int row = 0; row < height; row++) {
+				board[col][row] = 0;
+			}
+		}
 	}
 
 	/**
@@ -66,6 +84,10 @@ public class Display extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets each tile to have a number corresponding to the 
+	 * number of bombs surrounding each tile.
+	 */
 	public void fillBoard() {
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
@@ -177,6 +199,15 @@ public class Display extends JPanel {
 		return nearbyMines;
 	}
 
+	/**
+	 * A recursive function that takes a blank and then reveals
+	 * all blanks surrounding it. This function is called on each
+	 * blank surrounding the initial blank tile until all blanks
+	 * are surrounded by number tiles.
+	 * 
+	 * @param x		The x position of the initial tile.
+	 * @param y		The y position of the initial tile.
+	 */
 	public void revealBlank(int x, int y) {
 
 		revealed[x][y] = board[x][y];
@@ -299,7 +330,7 @@ public class Display extends JPanel {
 	 */
 	public void reveal(int x, int y) {
 
-		if (board[x][y] == MINETOKEN) {
+		if (board[x][y] == MINETOKEN && revealed[x][y] != FLAGTOKEN) {
 			gameOver();
 			showMines();
 			showWrongFlags();
@@ -321,8 +352,10 @@ public class Display extends JPanel {
 	public void flag(int x, int y) {
 		if (revealed[x][y] == -1) {
 			revealed[x][y] = FLAGTOKEN;
+			flagsRemaining--;
 		} else if (revealed[x][y] == FLAGTOKEN) {
 			revealed[x][y] = -1;
+			flagsRemaining++;
 		}
 		repaint();
 	}
@@ -425,7 +458,27 @@ public class Display extends JPanel {
 	}
 
 	public void addListeners() {
+		
+		this.addKeyListener(new KeyListener() {
 
+			@Override
+			public void keyTyped(KeyEvent e) {
+				
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_R) {
+					reset();
+				}
+			}
+			
+		});		
+		
 		this.addMouseListener(new MouseListener() {
 
 			@Override
@@ -478,6 +531,9 @@ public class Display extends JPanel {
 			}
 
 		});
+		
+		
+		
 	}
 
 }

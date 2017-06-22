@@ -1,6 +1,6 @@
-import java.awt.Dimension;
-
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 
 public class Minesweeper {
@@ -8,6 +8,7 @@ public class Minesweeper {
 	private final String TITLE = "Minesweepr";
 	
 	private Display display;
+	private JPanel panel;
 	
 	private JFrame frame;
 	
