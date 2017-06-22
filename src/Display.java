@@ -6,9 +6,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -28,6 +32,14 @@ public class Display extends JPanel {
 	public static int width = 9, height = 9;
 	public static int numOfMines = 10;
 	public static int flagsRemaining = numOfMines;
+	
+	public static int smileySize = 26 * SCALE;
+	public static int smileyTopLeftX;
+	public static int smileyTopLeftY;
+	public static int smileyBottomRightX;
+	public static int smileyBottomRightY;
+	
+	public BufferedImage smileyIcon;
 
 	public DecimalFormat df = new DecimalFormat("000");
 
@@ -56,13 +68,19 @@ public class Display extends JPanel {
 		random = new Random();
 		images = new Images();
 	}
+	
+	public void initSmiley() {
+		smileyTopLeftX = BORDERSIZE + ((width * TILESIZE) / 2) - (smileySize / 2);
+		smileyTopLeftY = BORDERSIZE + PADDING;
+		smileyIcon = Images.smileyUnpressed;
+	}
 
 	public void setupBoard() {
 		initBoard();
 		initRevealed();
 		placeMines(numOfMines);
 		setNumbers();
-		System.out.println("Game is setup!");
+		initSmiley();
 	}
 
 	public void reset() {
@@ -70,7 +88,6 @@ public class Display extends JPanel {
 		flagsRemaining = numOfMines;
 		gameOver = false;
 		repaint();
-		System.out.println("Game reset!");
 	}
 
 	public void initBoard() {
@@ -555,6 +572,7 @@ public class Display extends JPanel {
 
 		g.setFont(new Font("Arial", Font.BOLD, 42));
 		drawFlagsBox(g);
+		drawSmiley(g);
 		drawTimerBox(g);
 	}
 
@@ -564,10 +582,18 @@ public class Display extends JPanel {
 		g.setColor(Color.RED);
 		g.drawString(df.format(flagsRemaining), BORDERSIZE + (BORDERSIZE / 2), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
 	}
+	
+	public void drawSmiley(Graphics g) {
+		
+		g.drawImage(smileyIcon, smileyTopLeftX, smileyTopLeftY, smileySize, smileySize, null);
+	}
 
 	public void drawTimerBox(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(this.getWidth() - BORDERSIZE - PADDING * 2, BORDERSIZE + (BORDERSIZE / 2), -80, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
+		g.setColor(Color.RED);
+		g.drawString(df.format(0), this.getWidth() - BORDERSIZE - PADDING * 2 - 75, BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
+	
 	}
 
 	public void drawResetButton(Graphics g) {
@@ -650,6 +676,10 @@ public class Display extends JPanel {
 	public boolean inWindow(int x, int y) {
 		return ((x >= 0 && x < width) && (y >= 0 && y < height)) ? true : false;
 	}
+	
+	public boolean onSmiley(int x, int y) {
+		return (x > smileyTopLeftX && x < smileyTopLeftX + smileySize && y > smileyTopLeftY && y < smileyTopLeftY + smileySize);
+	}
 
 	public void addListeners() {
 
@@ -682,9 +712,19 @@ public class Display extends JPanel {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				
 				if (!gameOver) {
+					
+					int x = (e.getX() - BORDERSIZE) / TILESIZE;
+					int y = (e.getY() - TOPHEIGHT) / TILESIZE;
+					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = true;
+						if(onSmiley(e.getX(), e.getY())) {
+							smileyIcon = Images.smileyPressed;
+							System.out.println("Pressed smiley");
+							repaint();
+						}
 					} else if (SwingUtilities.isMiddleMouseButton(e)) {
 						middleMousePressed = true;
 					} else if (SwingUtilities.isRightMouseButton(e)) {
@@ -694,12 +734,18 @@ public class Display extends JPanel {
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) {
-
-				if (!gameOver) {
+			public void mouseReleased(MouseEvent e) {		
+				
+				if(onSmiley(e.getX(), e.getY())) {
+					reset();
+				} else {
+					smileyIcon = Images.smileyUnpressed;
+				}
+				
+				if (!gameOver && e.getY() > 97) {
 					int x = (e.getX() - BORDERSIZE) / TILESIZE;
 					int y = (e.getY() - TOPHEIGHT) / TILESIZE;
-
+					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = false;
 						if (inWindow(x, y))
@@ -713,6 +759,7 @@ public class Display extends JPanel {
 							flag(x, y);
 					}
 				}
+				repaint();
 			}
 
 			@Override

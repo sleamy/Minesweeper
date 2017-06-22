@@ -21,6 +21,12 @@ public class Images {
 	public static BufferedImage six;
 	public static BufferedImage seven;
 	public static BufferedImage eight;
+	public static BufferedImage smileyUnpressed;
+	public static BufferedImage smileyPressed;
+	public static BufferedImage smileyClicked;
+	public static BufferedImage smileyWin;
+	public static BufferedImage smileyDead;
+	
 	
 	
 	public Images() {
@@ -46,6 +52,11 @@ public class Images {
 			six = ImageIO.read(new File("res/six_128.png"));
 			seven = ImageIO.read(new File("res/seven_128.png"));
 			eight = ImageIO.read(new File("res/eight_128.png"));
+			smileyUnpressed = ImageIO.read(new File("res/smiley_52.png"));
+			smileyPressed = ImageIO.read(new File("res/smiley_pressed_52.png"));
+			smileyClicked = ImageIO.read(new File("res/smiley_click_52.png"));
+			smileyWin = ImageIO.read(new File("res/smiley_win_52.png"));
+			smileyDead = ImageIO.read(new File("res/smiley_dead_52.png"));
 			
 		} catch (IOException e) {
 			e.printStackTrace();
