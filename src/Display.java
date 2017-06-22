@@ -15,12 +15,12 @@ import javax.swing.SwingUtilities;
 public class Display extends JPanel {
 
 	public static final int SCALE = 2;
-	
+
 	public static final int MINETOKEN = 9;
 	public static final int FLAGTOKEN = -2;
 	public static final int CLICKEDMINE = -3;
 	public static final int CROSSTOKEN = -4;
-	
+
 	public static final int PADDING = 2 * SCALE;
 	public static final int BORDERSIZE = 10 * SCALE;
 	public static final int TOPHEIGHT = 50 * SCALE;
@@ -28,7 +28,7 @@ public class Display extends JPanel {
 	public static int width = 9, height = 9;
 	public static int numOfMines = 10;
 	public static int flagsRemaining = numOfMines;
-	
+
 	public DecimalFormat df = new DecimalFormat("000");
 
 	public int[][] board = new int[width][height];
@@ -45,14 +45,14 @@ public class Display extends JPanel {
 	public Display() {
 
 		this.setFocusable(true);
-		
+
 		init();
 		setupBoard();
 		addListeners();
 	}
 
 	public void init() {
-		this.setPreferredSize(new Dimension((width * TILESIZE + (BORDERSIZE * 2)), (height * TILESIZE)  + (TOPHEIGHT + BORDERSIZE)));
+		this.setPreferredSize(new Dimension((width * TILESIZE + (BORDERSIZE * 2)), (height * TILESIZE) + (TOPHEIGHT + BORDERSIZE)));
 		random = new Random();
 		images = new Images();
 	}
@@ -64,7 +64,7 @@ public class Display extends JPanel {
 		setNumbers();
 		System.out.println("Game is setup!");
 	}
-	
+
 	public void reset() {
 		setupBoard();
 		flagsRemaining = numOfMines;
@@ -72,7 +72,7 @@ public class Display extends JPanel {
 		repaint();
 		System.out.println("Game reset!");
 	}
-	
+
 	public void initBoard() {
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
@@ -93,8 +93,8 @@ public class Display extends JPanel {
 	}
 
 	/**
-	 * Sets each tile to have a number corresponding to the 
-	 * number of bombs surrounding each tile.
+	 * Sets each tile to have a number corresponding to the number of bombs
+	 * surrounding each tile.
 	 */
 	public void fillBoard() {
 		for (int col = 0; col < width; col++) {
@@ -208,23 +208,24 @@ public class Display extends JPanel {
 	}
 
 	/**
-	 * A recursive function that takes a blank and then reveals
-	 * all blanks surrounding it. This function is called on each
-	 * blank surrounding the initial blank tile until all blanks
-	 * are surrounded by number tiles.
+	 * A recursive function that takes a blank and then reveals all blanks
+	 * surrounding it. This function is called on each blank surrounding the
+	 * initial blank tile until all blanks are surrounded by number tiles.
 	 * 
-	 * @param x		The x position of the initial tile.
-	 * @param y		The y position of the initial tile.
+	 * @param x
+	 *            The x position of the initial tile.
+	 * @param y
+	 *            The y position of the initial tile.
 	 */
 	public void revealBlank(int x, int y) {
 
 		revealed[x][y] = board[x][y];
-		
+
 		// check top
 		if (y > 0) {
 			if (board[x][y - 1] == 0 && revealed[x][y - 1] != 0) {
 				revealBlank(x, y - 1);
-			} else if(board[x][y - 1] > 0 && revealed[x][y - 1] == -1) {
+			} else if (board[x][y - 1] > 0 && revealed[x][y - 1] == -1) {
 				revealed[x][y - 1] = board[x][y - 1];
 			}
 		}
@@ -233,7 +234,7 @@ public class Display extends JPanel {
 		if (y > 0 && x < width - 1) {
 			if (board[x + 1][y - 1] == 0 && revealed[x + 1][y - 1] != 0) {
 				revealBlank(x + 1, y - 1);
-			} else if(board[x + 1][y - 1] > 0 && revealed[x + 1][y - 1] == -1) {
+			} else if (board[x + 1][y - 1] > 0 && revealed[x + 1][y - 1] == -1) {
 				revealed[x + 1][y - 1] = board[x + 1][y - 1];
 			}
 		}
@@ -242,7 +243,7 @@ public class Display extends JPanel {
 		if (x < width - 1) {
 			if (board[x + 1][y] == 0 && revealed[x + 1][y] != 0) {
 				revealBlank(x + 1, y);
-			} else if(board[x + 1][y] > 0 && revealed[x + 1][y] == -1) {
+			} else if (board[x + 1][y] > 0 && revealed[x + 1][y] == -1) {
 				revealed[x + 1][y] = board[x + 1][y];
 			}
 		}
@@ -251,7 +252,7 @@ public class Display extends JPanel {
 		if (x < width - 1 && y < height - 1) {
 			if (board[x + 1][y + 1] == 0 && revealed[x + 1][y + 1] != 0) {
 				revealBlank(x + 1, y + 1);
-			} else if(board[x + 1][y + 1] > 0 && revealed[x + 1][y + 1] == -1) {
+			} else if (board[x + 1][y + 1] > 0 && revealed[x + 1][y + 1] == -1) {
 				revealed[x + 1][y + 1] = board[x + 1][y + 1];
 			}
 		}
@@ -260,7 +261,7 @@ public class Display extends JPanel {
 		if (y < height - 1) {
 			if (board[x][y + 1] == 0 && revealed[x][y + 1] != 0) {
 				revealBlank(x, y + 1);
-			} else if(board[x][y + 1] > 0 && revealed[x][y + 1] == -1) {
+			} else if (board[x][y + 1] > 0 && revealed[x][y + 1] == -1) {
 				revealed[x][y + 1] = board[x][y + 1];
 			}
 		}
@@ -269,7 +270,7 @@ public class Display extends JPanel {
 		if (x > 0 && y < height - 1) {
 			if (board[x - 1][y + 1] == 0 && revealed[x - 1][y + 1] != 0) {
 				revealBlank(x - 1, y + 1);
-			} else if(board[x - 1][y + 1] > 0 && revealed[x - 1][y + 1] == -1) {
+			} else if (board[x - 1][y + 1] > 0 && revealed[x - 1][y + 1] == -1) {
 				revealed[x - 1][y + 1] = board[x - 1][y + 1];
 			}
 		}
@@ -278,7 +279,7 @@ public class Display extends JPanel {
 		if (x > 0) {
 			if (board[x - 1][y] == 0 && revealed[x - 1][y] != 0) {
 				revealBlank(x - 1, y);
-			} else if(board[x - 1][y] > 0 && revealed[x - 1][y] == -1) {
+			} else if (board[x - 1][y] > 0 && revealed[x - 1][y] == -1) {
 				revealed[x - 1][y] = board[x - 1][y];
 			}
 		}
@@ -287,11 +288,123 @@ public class Display extends JPanel {
 		if (x > 0 && y > 0) {
 			if (board[x - 1][y - 1] == 0 && revealed[x - 1][y - 1] != 0) {
 				revealBlank(x - 1, y - 1);
-			} else if(board[x - 1][y - 1] > 0 && revealed[x - 1][y - 1] == -1) {
+			} else if (board[x - 1][y - 1] > 0 && revealed[x - 1][y - 1] == -1) {
 				revealed[x - 1][y - 1] = board[x - 1][y - 1];
 			}
 		}
 
+	}
+
+	public boolean allBombsFound(int x, int y) {
+
+		// check top
+		if (y > 0) {
+			if (board[x][y - 1] == MINETOKEN && revealed[x][y - 1] != -2) {
+				return false;
+			}
+		}
+
+		// check top-right
+		if (y > 0 && x < width - 1) {
+			if (board[x + 1][y - 1] == MINETOKEN && revealed[x + 1][y - 1] != -2) {
+				return false;
+			}
+		}
+
+		// check right
+		if (x < width - 1) {
+			if (board[x + 1][y] == MINETOKEN && revealed[x + 1][y] != -2) {
+				return false;
+			}
+		}
+
+		// check bottom-right
+		if (x < width - 1 && y < height - 1) {
+			if (board[x + 1][y + 1] == MINETOKEN && revealed[x + 1][y + 1] != -2) {
+				return false;
+			}
+		}
+
+		// check bottom
+		if (y < height - 1) {
+			if (board[x][y + 1] == MINETOKEN && revealed[x][y + 1] != -2) {
+				return false;
+			}
+		}
+
+		// check bottom-left
+		if (x > 0 && y < height - 1) {
+			if (board[x - 1][y + 1] == MINETOKEN && revealed[x - 1][y + 1] != -2) {
+				return false;
+			}
+		}
+
+		// check left
+		if (x > 0) {
+			if (board[x - 1][y] == MINETOKEN && revealed[x - 1][y] != -2) {
+				return false;
+			}
+		}
+
+		// check top-left
+		if (x > 0 && y > 0) {
+			if (board[x - 1][y - 1] == MINETOKEN && revealed[x - 1][y - 1] != -2) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void revealSurrounding(int x, int y) {
+		
+		// check top
+		if (y > 0) {
+			if (revealed[x][y - 1] == -1)
+				reveal(x, y - 1);
+		}
+
+		// check top-right
+		if (y > 0 && x < width - 1) {
+			if (revealed[x + 1][y - 1] == -1)
+				reveal(x + 1, y - 1);
+		}
+
+		// check right
+		if (x < width - 1) {
+			if (revealed[x + 1][y] == -1)
+				reveal(x + 1, y);
+		}
+
+		// check bottom-right
+		if (x < width - 1 && y < height - 1) {
+			if (revealed[x + 1][y + 1] == -1)
+				reveal(x + 1, y + 1);
+		}
+
+		// check bottom
+		if (y < height - 1) {
+			if (revealed[x][y + 1] == -1)
+				reveal(x, y + 1);
+		}
+
+		// check bottom-left
+		if (x > 0 && y < height - 1) {
+			if (revealed[x - 1][y + 1] == -1)
+				reveal(x - 1, y + 1);
+		}
+
+		// check left
+		if (x > 0) {
+			if (revealed[x - 1][y] == -1)
+				reveal(x - 1, y);
+		}
+
+		// check top-left
+		if (x > 0 && y > 0) {
+			if (revealed[x - 1][y - 1] == -1)
+				reveal(x - 1, y - 1);
+		}
+		repaint();
 	}
 
 	public void displayBoardInConsole() {
@@ -340,8 +453,6 @@ public class Display extends JPanel {
 
 		if (board[x][y] == MINETOKEN && revealed[x][y] != FLAGTOKEN) {
 			gameOver();
-			showMines();
-			showWrongFlags();
 			revealed[x][y] = CLICKEDMINE;
 		} else if (revealed[x][y] == FLAGTOKEN) {
 			return;
@@ -365,20 +476,25 @@ public class Display extends JPanel {
 		}
 		repaint();
 	}
-	
+
 	public void complete(int x, int y) {
-		
+		if (allBombsFound(x, y)) {
+			revealSurrounding(x, y);
+			repaint();
+		}
 	}
 
 	public void gameOver() {
 		gameOver = true;
+		showMines();
+		showWrongFlags();
 		System.out.println("You lose!");
 	}
-	
+
 	/*
-	 * 		EVERYTHING BELOW HERE IS FOR DRAWING
+	 * EVERYTHING BELOW HERE IS FOR DRAWING
 	 */
-	
+
 	public void paintComponent(Graphics g) {
 
 		g.setFont(new Font("Courier", Font.BOLD, 20));
@@ -398,14 +514,14 @@ public class Display extends JPanel {
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, width * TILESIZE + (BORDERSIZE * 2), height * TILESIZE + (TOPHEIGHT + BORDERSIZE));
 	}
-	
+
 	public void drawBorders(Graphics g) {
-		
-		drawTopBorder(g);	
+
+		drawTopBorder(g);
 		drawMainBorder(g);
 		drawApplicationBorder(g);
 	}
-	
+
 	public void drawTopBorder(Graphics g) {
 		g.setColor(Color.GRAY);
 		g.fillRect(BORDERSIZE - PADDING, BORDERSIZE, width * TILESIZE + PADDING, PADDING);
@@ -414,16 +530,16 @@ public class Display extends JPanel {
 		g.fillRect(BORDERSIZE, BORDERSIZE + (TOPHEIGHT - (BORDERSIZE * 2) - PADDING), width * TILESIZE + PADDING, PADDING);
 		g.fillRect(BORDERSIZE + (width * TILESIZE), BORDERSIZE, PADDING, TOPHEIGHT - (BORDERSIZE * 2));
 	}
-	
+
 	public void drawMainBorder(Graphics g) {
 		g.setColor(Color.GRAY);
 		g.fillRect(BORDERSIZE - PADDING, TOPHEIGHT - PADDING, width * TILESIZE + PADDING, PADDING);
 		g.fillRect(BORDERSIZE - PADDING, TOPHEIGHT - PADDING, PADDING, height * TILESIZE + (PADDING * 2));
 		g.setColor(Color.WHITE);
-		g.fillRect(BORDERSIZE, TOPHEIGHT + (TILESIZE * height), width * TILESIZE + PADDING, PADDING); 
+		g.fillRect(BORDERSIZE, TOPHEIGHT + (TILESIZE * height), width * TILESIZE + PADDING, PADDING);
 		g.fillRect(BORDERSIZE + (width * TILESIZE), TOPHEIGHT - PADDING, PADDING, height * TILESIZE + PADDING);
 	}
-	
+
 	public void drawApplicationBorder(Graphics g) {
 		g.setColor(Color.GRAY);
 		g.fillRect(0 + PADDING, this.getHeight() - PADDING, this.getWidth(), PADDING);
@@ -432,28 +548,28 @@ public class Display extends JPanel {
 		g.fillRect(0, 0, this.getWidth(), PADDING);
 		g.fillRect(0, 0, PADDING, this.getHeight());
 	}
-	
+
 	public void paintTop(Graphics g) {
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(BORDERSIZE, BORDERSIZE, width * TILESIZE, TOPHEIGHT - (BORDERSIZE * 2));
-		
+
 		g.setFont(new Font("Arial", Font.BOLD, 42));
 		drawFlagsBox(g);
 		drawTimerBox(g);
 	}
-	
+
 	public void drawFlagsBox(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(BORDERSIZE + (BORDERSIZE / 2) - PADDING, BORDERSIZE + (BORDERSIZE / 2), 80, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
 		g.setColor(Color.RED);
 		g.drawString(df.format(flagsRemaining), BORDERSIZE + (BORDERSIZE / 2), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
 	}
-	
+
 	public void drawTimerBox(Graphics g) {
 		g.setColor(Color.BLACK);
 		g.fillRect(this.getWidth() - BORDERSIZE - PADDING * 2, BORDERSIZE + (BORDERSIZE / 2), -80, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
 	}
-	
+
 	public void drawResetButton(Graphics g) {
 		g.setColor(Color.BLACK);
 	}
@@ -521,25 +637,27 @@ public class Display extends JPanel {
 	/**
 	 * Determines if the position of a click is within the bounds of the window.
 	 * 
-	 * @param x		The x position of the click.
-	 *            
-	 * @param y		The y position of the click.
-	 *            
-	 * @return		If the coords of the click are within the window, return true.
-	 *         	  	Otherwise return false.
+	 * @param x
+	 *            The x position of the click.
+	 * 
+	 * @param y
+	 *            The y position of the click.
+	 * 
+	 * @return If the coords of the click are within the window, return true.
+	 *         Otherwise return false.
 	 */
-	
+
 	public boolean inWindow(int x, int y) {
 		return ((x >= 0 && x < width) && (y >= 0 && y < height)) ? true : false;
 	}
 
 	public void addListeners() {
-		
+
 		this.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				
+
 			}
 
 			@Override
@@ -552,9 +670,9 @@ public class Display extends JPanel {
 					reset();
 				}
 			}
-			
-		});		
-		
+
+		});
+
 		this.addMouseListener(new MouseListener() {
 
 			@Override
@@ -588,7 +706,7 @@ public class Display extends JPanel {
 							reveal(x, y);
 					} else if (SwingUtilities.isMiddleMouseButton(e)) {
 						middleMousePressed = false;
-							complete(x, y);
+						complete(x, y);
 					} else if (SwingUtilities.isRightMouseButton(e)) {
 						rightMousePressed = false;
 						if (inWindow(x, y))
@@ -608,9 +726,7 @@ public class Display extends JPanel {
 			}
 
 		});
-		
-		
-		
+
 	}
 
 }
