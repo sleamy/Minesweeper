@@ -183,7 +183,16 @@ public class Display extends JPanel {
 	 * @param y		The y position of the tile that was clicked on.
 	 */
 	public void reveal(int x, int y) {
-		revealed[x][y] = board[x][y];
+		
+		if (revealed[x][y] == MINETOKEN) {
+			System.out.println("You lose!");
+			// Reveal bombs & incorrect flags
+		} else if (revealed[x][y] == -2 || revealed[x][y] == -3) {
+			return;
+		} else if (revealed[x][y] == -1) {
+			revealed[x][y] = board[x][y];			
+		}
+		
 		repaint();
 	}
 	
@@ -199,6 +208,7 @@ public class Display extends JPanel {
 	public void paintComponent(Graphics g) {
 
 		g.setFont(new Font("Courier", Font.BOLD, 20));
+		
 		clear(g);
 		paintBoard(g);
 	}
@@ -248,7 +258,11 @@ public class Display extends JPanel {
 					break;
 				case -2:
 					g.drawImage(Images.flag, col * TILESIZE, row * TILESIZE, TILESIZE, TILESIZE, null);
+				case -3:
+					// Question mark box.
+					break;
 				default:
+					// Nothing.
 				}
 			}
 		}
@@ -275,7 +289,7 @@ public class Display extends JPanel {
 	 * 				return false.
 	 */
 	public boolean inWindow(int x, int y) {		
-		return ((x > 0 && x < width) && (y > 0 && y < height)) ? true : false;
+		return ((x >= 0 && x < width) && (y >= 0 && y < height)) ? true : false;
 	}
 	
 	public void addListeners() {
