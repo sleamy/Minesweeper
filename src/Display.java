@@ -17,36 +17,38 @@ import javax.swing.SwingUtilities;
 
 public class Display extends JPanel {
 
-	public static final int SCALE = 2;
+	public int scale = 1;
 
 	public static final int MINETOKEN = 9;
 	public static final int FLAGTOKEN = -2;
 	public static final int CLICKEDMINE = -3;
 	public static final int CROSSTOKEN = -4;
 
-	public static final int PADDING = 2 * SCALE;
-	public static final int BORDERSIZE = 10 * SCALE;
-	public static final int TOPHEIGHT = 50 * SCALE;
-	public static final int TILESIZE = 16 * SCALE;
-	public static final int BOXWIDTH = 40 * SCALE;
-	public static int width = 9, height = 9;
-	public static int numOfMines = 10;
-	public static int flagsRemaining = numOfMines;
+	public int padding = 2 * scale;
+	public int borderSize = 10 * scale;
+	public int topHeight = 50 * scale;
+	public int tileSize = 16 * scale;
+	public int boxWidth = 40 * scale;
 	
-	public static int smileySize = 26 * SCALE;
-	public static int smileyTopLeftX;
-	public static int smileyTopLeftY;
-	public static int smileyBottomRightX;
-	public static int smileyBottomRightY;
+	public int width = 9;
+	public int height = 9;
+	public int numOfMines = 10;
+	public int flagsRemaining = numOfMines;
 	
-	public static int secondsPassed;
+	public int smileySize = 26 * scale;
+	public int smileyTopLeftX;
+	public int smileyTopLeftY;
+	public int smileyBottomRightX;
+	public int smileyBottomRightY;
+	
+	public int secondsPassed;
 	
 	public BufferedImage smileyIcon;
 
 	public DecimalFormat df = new DecimalFormat("000");
 
-	public int[][] board = new int[width][height];
-	public int[][] revealed = new int[width][height];
+	public int[][] board;
+	public int[][] revealed;
 
 	public Random random;
 	public Images images;
@@ -68,18 +70,33 @@ public class Display extends JPanel {
 		setupBoard();
 		addListeners();
 	}
+	
 
 	public void init() {
-		this.setPreferredSize(new Dimension((width * TILESIZE + (BORDERSIZE * 2)), (height * TILESIZE) + (TOPHEIGHT + BORDERSIZE)));
+		this.setPreferredSize(new Dimension((width * tileSize + (borderSize * 2)), (height * tileSize) + (topHeight + borderSize)));
 		random = new Random();
 		images = new Images();
 		timer = new Timer();
 	}
 	
+	public void reinitScale() {
+		padding = 2 * scale;
+		borderSize = 10 * scale;
+		topHeight = 50 * scale;
+		tileSize = 16 * scale;
+		boxWidth = 40 * scale;
+		smileySize = 26 * scale;
+		initSmiley();
+	}
+	
 	public void initSmiley() {
-		smileyTopLeftX = BORDERSIZE + ((width * TILESIZE) / 2) - (smileySize / 2);
-		smileyTopLeftY = BORDERSIZE + PADDING;
+		smileyTopLeftX = borderSize + ((width * tileSize) / 2) - (smileySize / 2);
+		smileyTopLeftY = borderSize + padding;
 		smileyIcon = Images.smileyUnpressed;
+	}
+	
+	public void resetSize() {
+		this.setPreferredSize(new Dimension((width * tileSize + (borderSize * 2)), (height * tileSize) + (topHeight + borderSize)));
 	}
 
 	public void setupBoard() {
@@ -97,13 +114,26 @@ public class Display extends JPanel {
 		if(timerStarted) {
 			timer.cancel();
 			timer.purge();
+			timerStarted = false;
 		}
-		timerStarted = false;
 		gameOver = false;
+		repaint();
+	}
+	
+	public void setMode(int width, int height, int mines) {
+		this.width = width;
+		this.height = height;
+		this.numOfMines = mines;
+		reset();
+	}
+	
+	public void setScale(int scale) {
+		this.scale = scale;
 		repaint();
 	}
 
 	public void initBoard() {
+		board = new int[width][height];
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
 				board[col][row] = 0;
@@ -115,6 +145,7 @@ public class Display extends JPanel {
 	 * Initialises all elements of the revealed array to -1.
 	 */
 	public void initRevealed() {
+		revealed = new int[width][height];
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
 				revealed[col][row] = -1;
@@ -563,14 +594,23 @@ public class Display extends JPanel {
 		showMines();
 		showWrongFlags();
 		smileyIcon = Images.smileyDead;
+		if(timerStarted) {
+			timer.cancel();
+			timer.purge();
+			timerStarted = false;
+		}
 		repaint();
-		System.out.println("You lose!");
 	}
 	
 	public void showWin() {
 		gameOver = true;
 		flagAllMines();
 		smileyIcon = Images.smileyWin;
+		if(timerStarted) {
+			timer.cancel();
+			timer.purge();
+			timerStarted = false;
+		}
 		repaint();
 		System.out.println("You won!");
 	}
@@ -596,7 +636,7 @@ public class Display extends JPanel {
 	 */
 	public void clear(Graphics g) {
 		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(0, 0, width * TILESIZE + (BORDERSIZE * 2), height * TILESIZE + (TOPHEIGHT + BORDERSIZE));
+		g.fillRect(0, 0, width * tileSize + (borderSize * 2), height * tileSize + (topHeight + borderSize));
 	}
 
 	public void drawBorders(Graphics g) {
@@ -608,36 +648,36 @@ public class Display extends JPanel {
 
 	public void drawTopBorder(Graphics g) {
 		g.setColor(Color.GRAY);
-		g.fillRect(BORDERSIZE - PADDING, BORDERSIZE, width * TILESIZE + PADDING, PADDING);
-		g.fillRect(BORDERSIZE - PADDING, BORDERSIZE, PADDING, TOPHEIGHT - (BORDERSIZE * 2));
+		g.fillRect(borderSize - padding, borderSize, width * tileSize + padding, padding);
+		g.fillRect(borderSize - padding, borderSize, padding, topHeight - (borderSize * 2));
 		g.setColor(Color.WHITE);
-		g.fillRect(BORDERSIZE, BORDERSIZE + (TOPHEIGHT - (BORDERSIZE * 2) - PADDING), width * TILESIZE + PADDING, PADDING);
-		g.fillRect(BORDERSIZE + (width * TILESIZE), BORDERSIZE, PADDING, TOPHEIGHT - (BORDERSIZE * 2));
+		g.fillRect(borderSize, borderSize + (topHeight - (borderSize * 2) - padding), width * tileSize + padding, padding);
+		g.fillRect(borderSize + (width * tileSize), borderSize, padding, topHeight - (borderSize * 2));
 	}
 
 	public void drawMainBorder(Graphics g) {
 		g.setColor(Color.GRAY);
-		g.fillRect(BORDERSIZE - PADDING, TOPHEIGHT - PADDING, width * TILESIZE + PADDING, PADDING);
-		g.fillRect(BORDERSIZE - PADDING, TOPHEIGHT - PADDING, PADDING, height * TILESIZE + (PADDING * 2));
+		g.fillRect(borderSize - padding, topHeight - padding, width * tileSize + padding, padding);
+		g.fillRect(borderSize - padding, topHeight - padding, padding, height * tileSize + (padding * 2));
 		g.setColor(Color.WHITE);
-		g.fillRect(BORDERSIZE, TOPHEIGHT + (TILESIZE * height), width * TILESIZE + PADDING, PADDING);
-		g.fillRect(BORDERSIZE + (width * TILESIZE), TOPHEIGHT - PADDING, PADDING, height * TILESIZE + PADDING);
+		g.fillRect(borderSize, topHeight + (tileSize * height), width * tileSize + padding, padding);
+		g.fillRect(borderSize + (width * tileSize), topHeight - padding, padding, height * tileSize + padding);
 	}
 
 	public void drawApplicationBorder(Graphics g) {
 		g.setColor(Color.GRAY);
-		g.fillRect(0 + PADDING, this.getHeight() - PADDING, this.getWidth(), PADDING);
-		g.fillRect(this.getWidth() - PADDING, 0, PADDING, this.getHeight());
+		g.fillRect(0 + padding, this.getHeight() - padding, this.getWidth(), padding);
+		g.fillRect(this.getWidth() - padding, 0, padding, this.getHeight());
 		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, this.getWidth(), PADDING);
-		g.fillRect(0, 0, PADDING, this.getHeight());
+		g.fillRect(0, 0, this.getWidth(), padding);
+		g.fillRect(0, 0, padding, this.getHeight());
 	}
 
 	public void paintTop(Graphics g) {
 		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(BORDERSIZE, BORDERSIZE, width * TILESIZE, TOPHEIGHT - (BORDERSIZE * 2));
+		g.fillRect(borderSize, borderSize, width * tileSize, topHeight - (borderSize * 2));
 
-		g.setFont(new Font("Arial", Font.BOLD, 21 * SCALE));
+		g.setFont(new Font("Arial", Font.BOLD, 21 * scale));
 		drawFlagsBox(g);
 		drawSmiley(g);
 		drawTimerBox(g);
@@ -645,9 +685,9 @@ public class Display extends JPanel {
 
 	public void drawFlagsBox(Graphics g) {
 		g.setColor(Color.BLACK);
-		g.fillRect(BORDERSIZE + (BORDERSIZE / 2) - PADDING, BORDERSIZE + (BORDERSIZE / 2), 40 * SCALE, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
+		g.fillRect(borderSize + (borderSize / 2) - padding, borderSize + (borderSize / 2), 40 * scale, topHeight - (borderSize * 2) - (borderSize / 2) - padding * 3);
 		g.setColor(Color.RED);
-		g.drawString(df.format(flagsRemaining), BORDERSIZE + (BORDERSIZE / 2), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
+		g.drawString(df.format(flagsRemaining), borderSize + (borderSize / 2), borderSize + (borderSize / 2) + (topHeight - (borderSize * 2) - (borderSize / 2) - padding * 3) - padding);
 	}
 	
 	public void drawSmiley(Graphics g) {
@@ -657,9 +697,9 @@ public class Display extends JPanel {
 
 	public void drawTimerBox(Graphics g) {
 		g.setColor(Color.BLACK);
-		g.fillRect(this.getWidth() - BORDERSIZE - PADDING * 2, BORDERSIZE + (BORDERSIZE / 2), -BOXWIDTH, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
+		g.fillRect(this.getWidth() - borderSize - padding * 2, borderSize + (borderSize / 2), -boxWidth, topHeight - (borderSize * 2) - (borderSize / 2) - padding * 3);
 		g.setColor(Color.RED);
-		g.drawString(df.format(secondsPassed), this.getWidth() - BORDERSIZE - PADDING * 2 - ((BOXWIDTH - (PADDING))), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
+		g.drawString(df.format(secondsPassed), this.getWidth() - borderSize - padding * 2 - ((boxWidth - (padding))), borderSize + (borderSize / 2) + (topHeight - (borderSize * 2) - (borderSize / 2) - padding * 3) - padding);
 	
 	}
 
@@ -679,46 +719,46 @@ public class Display extends JPanel {
 			for (int row = 0; row < height; row++) {
 				switch (revealed[col][row]) {
 				case MINETOKEN:
-					g.drawImage(Images.mine, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.mine, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 1:
-					g.drawImage(Images.one, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.one, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 2:
-					g.drawImage(Images.two, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.two, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 3:
-					g.drawImage(Images.three, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.three, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 4:
-					g.drawImage(Images.four, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.four, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 5:
-					g.drawImage(Images.five, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.five, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 6:
-					g.drawImage(Images.six, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.six, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 7:
-					g.drawImage(Images.seven, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.seven, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 8:
-					g.drawImage(Images.eight, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.eight, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case 0:
-					g.drawImage(Images.pressed, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.pressed, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case -1:
-					g.drawImage(Images.unpressed, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.unpressed, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case FLAGTOKEN:
-					g.drawImage(Images.flag, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.flag, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case CLICKEDMINE:
-					g.drawImage(Images.clickedMine, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.clickedMine, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				case CROSSTOKEN:
-					g.drawImage(Images.cross, col * TILESIZE + BORDERSIZE, row * TILESIZE + TOPHEIGHT, TILESIZE, TILESIZE, null);
+					g.drawImage(Images.cross, col * tileSize + borderSize, row * tileSize + topHeight, tileSize, tileSize, null);
 					break;
 				default:
 					// Nothing.
@@ -767,8 +807,8 @@ public class Display extends JPanel {
 				
 				if (!gameOver) {
 					
-					int x = (e.getX() - BORDERSIZE) / TILESIZE;
-					int y = (e.getY() - TOPHEIGHT) / TILESIZE;
+					int x = (e.getX() - borderSize) / tileSize;
+					int y = (e.getY() - topHeight) / tileSize;
 					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = true;
@@ -795,9 +835,9 @@ public class Display extends JPanel {
 					smileyIcon = Images.smileyUnpressed;
 				}
 				
-				if (!gameOver && e.getY() > 49 * SCALE) {
-					int x = (e.getX() - BORDERSIZE) / TILESIZE;
-					int y = (e.getY() - TOPHEIGHT) / TILESIZE;
+				if (!gameOver && (e.getY() > 49 * scale) && e.getX() > borderSize) {
+					int x = (e.getX() - borderSize) / tileSize;
+					int y = (e.getY() - topHeight) / tileSize;
 					
 					if(!timerStarted) {
 						task = new TimerTask() {
