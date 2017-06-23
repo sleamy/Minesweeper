@@ -2,8 +2,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -16,6 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 public class Display extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 
 	public int scale = 1;
 
@@ -817,9 +817,6 @@ public class Display extends JPanel {
 				}
 				
 				if (!gameOver) {
-					
-					int x = (e.getX() - borderSize) / tileSize;
-					int y = (e.getY() - topHeight) / tileSize;
 					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = true;

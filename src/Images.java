@@ -25,9 +25,7 @@ public class Images {
 	public static BufferedImage smileyPressed;
 	public static BufferedImage smileyClicked;
 	public static BufferedImage smileyWin;
-	public static BufferedImage smileyDead;
-	
-	
+	public static BufferedImage smileyDead;	
 	
 	public Images() {
 		
