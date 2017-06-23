@@ -9,10 +9,9 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -40,6 +39,8 @@ public class Display extends JPanel {
 	public static int smileyBottomRightX;
 	public static int smileyBottomRightY;
 	
+	public static int secondsPassed;
+	
 	public BufferedImage smileyIcon;
 
 	public DecimalFormat df = new DecimalFormat("000");
@@ -54,6 +55,10 @@ public class Display extends JPanel {
 	public boolean leftMousePressed = false;
 	public boolean middleMousePressed = false;
 	public boolean rightMousePressed = false;
+	
+	public Timer timer;
+	public TimerTask task;
+	public boolean timerStarted = false;
 
 	public Display() {
 
@@ -68,6 +73,7 @@ public class Display extends JPanel {
 		this.setPreferredSize(new Dimension((width * TILESIZE + (BORDERSIZE * 2)), (height * TILESIZE) + (TOPHEIGHT + BORDERSIZE)));
 		random = new Random();
 		images = new Images();
+		timer = new Timer();
 	}
 	
 	public void initSmiley() {
@@ -87,6 +93,12 @@ public class Display extends JPanel {
 	public void reset() {
 		setupBoard();
 		flagsRemaining = numOfMines;
+		secondsPassed = 0;
+		if(timerStarted) {
+			timer.cancel();
+			timer.purge();
+		}
+		timerStarted = false;
 		gameOver = false;
 		repaint();
 	}
@@ -536,15 +548,11 @@ public class Display extends JPanel {
 			revealed[x][y] = -1;
 			flagsRemaining++;
 		}
-		if(allMinesFlagged()) {
-			revealAllTiles();
-			showWin();
-		}
 		repaint();
 	}
 
 	public void complete(int x, int y) {
-		if (allBombsFound(x, y)) {
+		if (revealed[x][y] > 0 && allBombsFound(x, y)) {
 			revealSurrounding(x, y);
 			repaint();
 		}
@@ -651,7 +659,7 @@ public class Display extends JPanel {
 		g.setColor(Color.BLACK);
 		g.fillRect(this.getWidth() - BORDERSIZE - PADDING * 2, BORDERSIZE + (BORDERSIZE / 2), -BOXWIDTH, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
 		g.setColor(Color.RED);
-		g.drawString(df.format(0), this.getWidth() - BORDERSIZE - PADDING * 2 - ((BOXWIDTH - (PADDING))), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
+		g.drawString(df.format(secondsPassed), this.getWidth() - BORDERSIZE - PADDING * 2 - ((BOXWIDTH - (PADDING))), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
 	
 	}
 
@@ -742,26 +750,6 @@ public class Display extends JPanel {
 
 	public void addListeners() {
 
-		this.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_R) {
-					reset();
-				}
-			}
-
-		});
-
 		this.addMouseListener(new MouseListener() {
 
 			@Override
@@ -774,7 +762,6 @@ public class Display extends JPanel {
 				
 				if(onSmiley(e.getX(), e.getY())) {
 					smileyIcon = Images.smileyPressed;
-					System.out.println("Pressed smiley");
 					repaint();
 				}
 				
@@ -785,8 +772,10 @@ public class Display extends JPanel {
 					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = true;
-						smileyIcon = Images.smileyClicked;
-						repaint();
+						if(!onSmiley(e.getX(), e.getY())) {
+							smileyIcon = Images.smileyClicked;
+							repaint();
+						}
 					} else if (SwingUtilities.isMiddleMouseButton(e)) {
 						middleMousePressed = true;
 						smileyIcon = Images.smileyClicked;
@@ -809,6 +798,21 @@ public class Display extends JPanel {
 				if (!gameOver && e.getY() > 49 * SCALE) {
 					int x = (e.getX() - BORDERSIZE) / TILESIZE;
 					int y = (e.getY() - TOPHEIGHT) / TILESIZE;
+					
+					if(!timerStarted) {
+						task = new TimerTask() {
+
+							@Override
+							public void run() {
+								secondsPassed++;
+								repaint();
+							}
+							
+						};
+						timer = new Timer();
+						timer.scheduleAtFixedRate(task, 1000, 1000);
+						timerStarted = true;
+					}
 					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = false;
