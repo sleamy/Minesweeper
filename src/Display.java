@@ -29,6 +29,7 @@ public class Display extends JPanel {
 	public static final int BORDERSIZE = 10 * SCALE;
 	public static final int TOPHEIGHT = 50 * SCALE;
 	public static final int TILESIZE = 16 * SCALE;
+	public static final int BOXWIDTH = 40 * SCALE;
 	public static int width = 9, height = 9;
 	public static int numOfMines = 10;
 	public static int flagsRemaining = numOfMines;
@@ -423,6 +424,20 @@ public class Display extends JPanel {
 		}
 		repaint();
 	}
+	
+	public boolean allMinesFlagged() {
+		
+		return true;
+	}
+	
+	public boolean allTilesRevealed() {
+		
+		return false;
+	}
+	
+	public void flagAllMines() {
+		
+	}
 
 	public void displayBoardInConsole() {
 
@@ -479,6 +494,9 @@ public class Display extends JPanel {
 			} else {
 				revealed[x][y] = board[x][y];
 			}
+			if(allTilesRevealed()) {
+				showWin();
+			}
 		}
 		repaint();
 	}
@@ -505,7 +523,17 @@ public class Display extends JPanel {
 		gameOver = true;
 		showMines();
 		showWrongFlags();
+		smileyIcon = Images.smileyDead;
+		repaint();
 		System.out.println("You lose!");
+	}
+	
+	public void showWin() {
+		gameOver = true;
+		flagAllMines();
+		smileyIcon = Images.smileyWin;
+		repaint();
+		System.out.println("You won!");
 	}
 
 	/*
@@ -570,7 +598,7 @@ public class Display extends JPanel {
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(BORDERSIZE, BORDERSIZE, width * TILESIZE, TOPHEIGHT - (BORDERSIZE * 2));
 
-		g.setFont(new Font("Arial", Font.BOLD, 42));
+		g.setFont(new Font("Arial", Font.BOLD, 21 * SCALE));
 		drawFlagsBox(g);
 		drawSmiley(g);
 		drawTimerBox(g);
@@ -578,7 +606,7 @@ public class Display extends JPanel {
 
 	public void drawFlagsBox(Graphics g) {
 		g.setColor(Color.BLACK);
-		g.fillRect(BORDERSIZE + (BORDERSIZE / 2) - PADDING, BORDERSIZE + (BORDERSIZE / 2), 80, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
+		g.fillRect(BORDERSIZE + (BORDERSIZE / 2) - PADDING, BORDERSIZE + (BORDERSIZE / 2), 40 * SCALE, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
 		g.setColor(Color.RED);
 		g.drawString(df.format(flagsRemaining), BORDERSIZE + (BORDERSIZE / 2), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
 	}
@@ -590,9 +618,9 @@ public class Display extends JPanel {
 
 	public void drawTimerBox(Graphics g) {
 		g.setColor(Color.BLACK);
-		g.fillRect(this.getWidth() - BORDERSIZE - PADDING * 2, BORDERSIZE + (BORDERSIZE / 2), -80, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
+		g.fillRect(this.getWidth() - BORDERSIZE - PADDING * 2, BORDERSIZE + (BORDERSIZE / 2), -BOXWIDTH, TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3);
 		g.setColor(Color.RED);
-		g.drawString(df.format(0), this.getWidth() - BORDERSIZE - PADDING * 2 - 75, BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
+		g.drawString(df.format(0), this.getWidth() - BORDERSIZE - PADDING * 2 - ((BOXWIDTH - (PADDING))), BORDERSIZE + (BORDERSIZE / 2) + (TOPHEIGHT - (BORDERSIZE * 2) - (BORDERSIZE / 2) - PADDING * 3) - PADDING);
 	
 	}
 
@@ -713,6 +741,12 @@ public class Display extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
+				if(onSmiley(e.getX(), e.getY())) {
+					smileyIcon = Images.smileyPressed;
+					System.out.println("Pressed smiley");
+					repaint();
+				}
+				
 				if (!gameOver) {
 					
 					int x = (e.getX() - BORDERSIZE) / TILESIZE;
@@ -720,13 +754,12 @@ public class Display extends JPanel {
 					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = true;
-						if(onSmiley(e.getX(), e.getY())) {
-							smileyIcon = Images.smileyPressed;
-							System.out.println("Pressed smiley");
-							repaint();
-						}
+						smileyIcon = Images.smileyClicked;
+						repaint();
 					} else if (SwingUtilities.isMiddleMouseButton(e)) {
 						middleMousePressed = true;
+						smileyIcon = Images.smileyClicked;
+						repaint();
 					} else if (SwingUtilities.isRightMouseButton(e)) {
 						rightMousePressed = true;
 					}
@@ -738,11 +771,11 @@ public class Display extends JPanel {
 				
 				if(onSmiley(e.getX(), e.getY())) {
 					reset();
-				} else {
+				} else if (!gameOver){
 					smileyIcon = Images.smileyUnpressed;
 				}
 				
-				if (!gameOver && e.getY() > 97) {
+				if (!gameOver && e.getY() > 49 * SCALE) {
 					int x = (e.getX() - BORDERSIZE) / TILESIZE;
 					int y = (e.getY() - TOPHEIGHT) / TILESIZE;
 					

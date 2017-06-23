@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 
 public class Minesweeper {
 
-	private final String TITLE = "Minesweepr";
+	private final String TITLE = "Minesweeper";
 	
 	private Display display;
 	private JPanel panel;
