@@ -427,16 +427,43 @@ public class Display extends JPanel {
 	
 	public boolean allMinesFlagged() {
 		
+		for (int col = 0; col < width; col++) {
+			for (int row = 0; row < height; row++) {
+				if(board[col][row] == MINETOKEN && revealed[col][row] != FLAGTOKEN) return false;
+			}
+		}
 		return true;
 	}
 	
 	public boolean allTilesRevealed() {
 		
-		return false;
+		for (int col = 0; col < width; col++) {
+			for (int row = 0; row < height; row++) {
+				if(board[col][row] != MINETOKEN && revealed[col][row] != board[col][row]) return false;
+			}
+		}
+		return true;
 	}
 	
 	public void flagAllMines() {
-		
+		for (int col = 0; col < width; col++) {
+			for (int row = 0; row < height; row++) {
+				if(board[col][row] == MINETOKEN) {
+					revealed[col][row] = FLAGTOKEN;
+				}
+			}
+		}
+		flagsRemaining = 0;
+	}
+	
+	public void revealAllTiles() {
+		for (int col = 0; col < width; col++) {
+			for (int row = 0; row < height; row++) {
+				if(board[col][row] != MINETOKEN) {
+					revealed[col][row] = board[col][row];
+				}
+			}
+		}
 	}
 
 	public void displayBoardInConsole() {
@@ -508,6 +535,10 @@ public class Display extends JPanel {
 		} else if (revealed[x][y] == FLAGTOKEN) {
 			revealed[x][y] = -1;
 			flagsRemaining++;
+		}
+		if(allMinesFlagged()) {
+			revealAllTiles();
+			showWin();
 		}
 		repaint();
 	}
