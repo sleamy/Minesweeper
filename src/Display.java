@@ -61,6 +61,17 @@ public class Display extends JPanel {
 	public Timer timer;
 	public TimerTask task;
 	public boolean timerStarted = false;
+	
+	public Mode mode = Mode.BEGINNER;
+	public Scale cScale = Scale.ONE;
+	
+	public enum Mode {
+		BEGINNER, INTERMEDIATE, EXPERT
+	}
+	
+	public enum Scale {
+		ONE, TWO, THREE, FOUR
+	}
 
 	public Display() {
 
@@ -85,11 +96,11 @@ public class Display extends JPanel {
 		topHeight = 50 * scale;
 		tileSize = 16 * scale;
 		boxWidth = 40 * scale;
-		smileySize = 26 * scale;
 		initSmiley();
 	}
 	
 	public void initSmiley() {
+		smileySize = 26 * scale;
 		smileyTopLeftX = borderSize + ((width * tileSize) / 2) - (smileySize / 2);
 		smileyTopLeftY = borderSize + padding;
 		smileyIcon = Images.smileyUnpressed;
