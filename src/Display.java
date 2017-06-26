@@ -18,7 +18,8 @@ public class Display extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	public int scale = 1;
-
+	
+	// Values for non-number tiles
 	public static final int MINETOKEN = 9;
 	public static final int FLAGTOKEN = -2;
 	public static final int CLICKEDMINE = -3;
@@ -35,6 +36,7 @@ public class Display extends JPanel {
 	public int numOfMines = 10;
 	public int flagsRemaining = numOfMines;
 	
+	// Values for the smiley button
 	public int smileySize = 26 * scale;
 	public int smileyTopLeftX;
 	public int smileyTopLeftY;
@@ -106,10 +108,18 @@ public class Display extends JPanel {
 		smileyIcon = Images.smileyUnpressed;
 	}
 	
+	/**
+	 * Function used for resizing window on change of difficulty or scale.
+	 */
 	public void resetSize() {
 		this.setPreferredSize(new Dimension((width * tileSize + (borderSize * 2)), (height * tileSize) + (topHeight + borderSize)));
 	}
 
+	/**
+	 * Initialised the board array to contain mines and the number of mines
+	 * surrouding each tile and sets the revealed array to have all values 
+	 * set to -1.
+	 */
 	public void setupBoard() {
 		initBoard();
 		initRevealed();
@@ -118,6 +128,9 @@ public class Display extends JPanel {
 		initSmiley();
 	}
 
+	/**
+	 * Resets the game.
+	 */
 	public void reset() {
 		setupBoard();
 		flagsRemaining = numOfMines;
@@ -131,6 +144,15 @@ public class Display extends JPanel {
 		repaint();
 	}
 	
+	/**
+	 * Changes the values for the number of tiles of the game
+	 * and the number of mines to be placed in the board then
+	 * resets the game.
+	 * 
+	 * @param width		The number of tiles in a row.
+	 * @param height	The number of tiles in a column.
+	 * @param mines		The number of mines placed on the board.
+	 */
 	public void setMode(int width, int height, int mines) {
 		this.width = width;
 		this.height = height;
@@ -143,6 +165,9 @@ public class Display extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * Initialises all values of the board array to be 0.
+	 */
 	public void initBoard() {
 		board = new int[width][height];
 		for (int col = 0; col < width; col++) {
@@ -367,6 +392,14 @@ public class Display extends JPanel {
 
 	}
 
+	/**
+	 * Determines if all the mines surrounding a tile have been flagged.
+	 * 
+	 * @param x		The x position of the tile.
+	 * @param y		The y position of the tile.
+	 * @return		True if all surrounding mines have been flagged, false
+	 * 				otherwise.
+	 */
 	public boolean allBombsFound(int x, int y) {
 
 		// check top
@@ -427,6 +460,12 @@ public class Display extends JPanel {
 		return true;
 	}
 
+	/**
+	 * Reveals all blank tiles surrounding a tile. 
+	 * 
+	 * @param x		The x position of the tile.
+	 * @param y		The y position of the tile.
+	 */
 	public void revealSurrounding(int x, int y) {
 		
 		// check top
@@ -479,6 +518,12 @@ public class Display extends JPanel {
 		repaint();
 	}
 	
+	/**
+	 * Determines if all mines in the game board have been flagged.
+	 * 
+	 * @return		True if all mines in the board have been flagged,
+	 * 				false otherwise.
+	 */
 	public boolean allMinesFlagged() {
 		
 		for (int col = 0; col < width; col++) {
@@ -489,6 +534,12 @@ public class Display extends JPanel {
 		return true;
 	}
 	
+	/**
+	 * Determines if all tiles in the game board have been revealed.
+	 * 
+	 * @return		True if all tiles in the board have been revealed,
+	 * 				false otherwise.
+	 */
 	public boolean allTilesRevealed() {
 		
 		for (int col = 0; col < width; col++) {
@@ -499,6 +550,10 @@ public class Display extends JPanel {
 		return true;
 	}
 	
+	/**
+	 * Sets all mines to be flagged for when a player has revealed
+	 * all non-mine tiles but has not flagged all mines.
+	 */
 	public void flagAllMines() {
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
@@ -510,6 +565,10 @@ public class Display extends JPanel {
 		flagsRemaining = 0;
 	}
 	
+	/**
+	 * Sets all tiles in the game board to be revealed for when a player
+	 * has flagged all mines but has not reveal all non-mine tiles.
+	 */
 	public void revealAllTiles() {
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
@@ -520,6 +579,9 @@ public class Display extends JPanel {
 		}
 	}
 
+	/**
+	 * Prints the board in the console.
+	 */
 	public void displayBoardInConsole() {
 
 		for (int col = 0; col < width; col++) {
@@ -531,6 +593,10 @@ public class Display extends JPanel {
 
 	}
 
+	/**
+	 * Reveals all mines that have not been flagged.
+	 * Used for when a player clicks on a mine and loses.
+	 */
 	public void showMines() {
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
@@ -543,6 +609,9 @@ public class Display extends JPanel {
 		}
 	}
 
+	/**
+	 * Changes all flags that are not mine tiles to be crossed out mines.
+	 */
 	public void showWrongFlags() {
 		for (int col = 0; col < width; col++) {
 			for (int row = 0; row < height; row++) {
@@ -582,6 +651,12 @@ public class Display extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * Changes a blank tile to be a flagged tile.
+	 * 
+	 * @param x		The x position of the tile.
+	 * @param y		The y position of the tile.
+	 */
 	public void flag(int x, int y) {
 		if (revealed[x][y] == -1) {
 			revealed[x][y] = FLAGTOKEN;
@@ -593,6 +668,13 @@ public class Display extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * Reveals all surrounding tiles that have not be revealed
+	 * only if all bombs surrounding the tile have been flagged.
+	 * 
+	 * @param x		The x position of the tile.
+	 * @param y		The y position of the tile.
+	 */
 	public void complete(int x, int y) {
 		if (revealed[x][y] > 0 && allBombsFound(x, y)) {
 			revealSurrounding(x, y);
@@ -600,6 +682,11 @@ public class Display extends JPanel {
 		}
 	}
 
+	/**
+	 * Shows the game over screen by revealing all unflagged mines,
+	 * revealing all incorrectly flagged tiles and changing the 
+	 * smiley button to a cross-eyed smiley button.
+	 */
 	public void gameOver() {
 		gameOver = true;
 		showMines();
@@ -613,6 +700,10 @@ public class Display extends JPanel {
 		repaint();
 	}
 	
+	/**
+	 * Shows the winning screen by changing the smiley button to
+	 * a smiley with glasses and stopping the timer.
+	 */
 	public void showWin() {
 		gameOver = true;
 		flagAllMines();
@@ -781,20 +872,28 @@ public class Display extends JPanel {
 	/**
 	 * Determines if the position of a click is within the bounds of the window.
 	 * 
-	 * @param x
-	 *            The x position of the click.
+	 * @param x   	The x position of the click.
 	 * 
-	 * @param y
-	 *            The y position of the click.
+	 * @param y 	The y position of the click.
 	 * 
-	 * @return If the coords of the click are within the window, return true.
-	 *         Otherwise return false.
+	 * @return 		If the coords of the click are within the window, return true.
+	 *         		Otherwise return false.
 	 */
 
 	public boolean inWindow(int x, int y) {
 		return ((x >= 0 && x < width) && (y >= 0 && y < height)) ? true : false;
 	}
 	
+	
+	/**
+	 * Determines if the (x, y) coordinates are within the bounds of the smiley
+	 * button.
+	 * 
+	 * @param x		The x position of the mouse pointer.
+	 * @param y		The y position of the mouse pointer.
+	 * @return		True if the x and y positions are within the bounds of the
+	 * 				smiley button, false otherwise.
+	 */
 	public boolean onSmiley(int x, int y) {
 		return (x > smileyTopLeftX && x < smileyTopLeftX + smileySize && y > smileyTopLeftY && y < smileyTopLeftY + smileySize);
 	}
@@ -811,6 +910,7 @@ public class Display extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
+				// If mouse is pressed on the smiley button change the icon
 				if(onSmiley(e.getX(), e.getY())) {
 					smileyIcon = Images.smileyPressed;
 					repaint();
@@ -818,15 +918,16 @@ public class Display extends JPanel {
 				
 				if (!gameOver) {
 					
+					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = true;
 						if(!onSmiley(e.getX(), e.getY())) {
-							smileyIcon = Images.smileyClicked;
+							smileyIcon = Images.smileyClicked;		// If tile is clicked change the smiley button to the clicked icon
 							repaint();
 						}
 					} else if (SwingUtilities.isMiddleMouseButton(e)) {
 						middleMousePressed = true;
-						smileyIcon = Images.smileyClicked;
+						smileyIcon = Images.smileyClicked;			// If tile is clicked change the smiley button to the clicked icon
 						repaint();
 					} else if (SwingUtilities.isRightMouseButton(e)) {
 						rightMousePressed = true;
@@ -837,19 +938,20 @@ public class Display extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {		
 				
+				// If the mouse is released on the smiley button, reset the game.
 				if(onSmiley(e.getX(), e.getY())) {
 					reset();
 				} else if (!gameOver){
-					smileyIcon = Images.smileyUnpressed;
+					smileyIcon = Images.smileyUnpressed;	// Change the smiley icon to the normal smiley icon
 				}
 				
 				if (!gameOver && (e.getY() > 49 * scale) && e.getX() > borderSize) {
 					int x = (e.getX() - borderSize) / tileSize;
 					int y = (e.getY() - topHeight) / tileSize;
 					
+					// Starts the timer if it is not already running.
 					if(!timerStarted) {
 						task = new TimerTask() {
-
 							@Override
 							public void run() {
 								secondsPassed++;

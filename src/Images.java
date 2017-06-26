@@ -36,6 +36,9 @@ public class Images {
 	public void loadImages() {
 		
 		try {
+			
+			// Reading images from file directory
+			/*
 			unpressed = ImageIO.read(new File("res/blank_128.png"));
 			pressed = ImageIO.read(new File("res/pressed_128.png"));
 			mine = ImageIO.read(new File("res/mine_128.png"));
@@ -55,6 +58,28 @@ public class Images {
 			smileyClicked = ImageIO.read(new File("res/smiley_click_52.png"));
 			smileyWin = ImageIO.read(new File("res/smiley_win_52.png"));
 			smileyDead = ImageIO.read(new File("res/smiley_dead_52.png"));
+			*/
+			
+			// Reading images from .jar
+			unpressed = ImageIO.read(getClass().getResourceAsStream("blank_128.png"));
+			pressed = ImageIO.read(getClass().getResourceAsStream("pressed_128.png"));
+			mine = ImageIO.read(getClass().getResourceAsStream("mine_128.png"));
+			flag = ImageIO.read(getClass().getResourceAsStream("flag_128.png"));
+			cross = ImageIO.read(getClass().getResourceAsStream("cross_32.png"));
+			clickedMine = ImageIO.read(getClass().getResourceAsStream("clicked_mine_32.png"));
+			one = ImageIO.read(getClass().getResourceAsStream("one_128.png"));
+			two = ImageIO.read(getClass().getResourceAsStream("two_128.png"));
+			three = ImageIO.read(getClass().getResourceAsStream("three_128.png"));
+			four = ImageIO.read(getClass().getResourceAsStream("four_128.png"));
+			five = ImageIO.read(getClass().getResourceAsStream("five_128.png"));
+			six = ImageIO.read(getClass().getResourceAsStream("six_128.png"));
+			seven = ImageIO.read(getClass().getResourceAsStream("seven_128.png"));
+			eight = ImageIO.read(getClass().getResourceAsStream("eight_128.png"));
+			smileyUnpressed = ImageIO.read(getClass().getResourceAsStream("smiley_52.png"));
+			smileyPressed = ImageIO.read(getClass().getResourceAsStream("smiley_pressed_52.png"));
+			smileyClicked = ImageIO.read(getClass().getResourceAsStream("smiley_click_52.png"));
+			smileyWin = ImageIO.read(getClass().getResourceAsStream("smiley_win_52.png"));
+			smileyDead = ImageIO.read(getClass().getResourceAsStream("smiley_dead_52.png"));
 			
 		} catch (IOException e) {
 			e.printStackTrace();
