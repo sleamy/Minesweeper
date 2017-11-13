@@ -320,49 +320,49 @@ public class Display extends JPanel {
 
 		// check top
 		if (y > 0) {
-			if (board[x][y - 1] == FLAGTOKEN)
+			if (revealed[x][y - 1] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
 		// check top-right
 		if (y > 0 && x < width - 1) {
-			if (board[x + 1][y - 1] == FLAGTOKEN)
+			if (revealed[x + 1][y - 1] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
 		// check right
 		if (x < width - 1) {
-			if (board[x + 1][y] == FLAGTOKEN)
+			if (revealed[x + 1][y] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
 		// check bottom-right
 		if (x < width - 1 && y < height - 1) {
-			if (board[x + 1][y + 1] == FLAGTOKEN)
+			if (revealed[x + 1][y + 1] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
 		// check bottom
 		if (y < height - 1) {
-			if (board[x][y + 1] == FLAGTOKEN)
+			if (revealed[x][y + 1] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
 		// check bottom-left
 		if (x > 0 && y < height - 1) {
-			if (board[x - 1][y + 1] == FLAGTOKEN)
+			if (revealed[x - 1][y + 1] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
 		// check left
 		if (x > 0) {
-			if (board[x - 1][y] == FLAGTOKEN)
+			if (revealed[x - 1][y] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
 		// check top-left
 		if (x > 0 && y > 0) {
-			if (board[x - 1][y - 1] == FLAGTOKEN)
+			if (revealed[x - 1][y - 1] == FLAGTOKEN)
 				nearbyFlags++;
 		}
 
@@ -745,7 +745,9 @@ public class Display extends JPanel {
 			revealSurrounding(x, y);
 			repaint();
 		} else {
-			// add checking for surrounding flags 
+			if(countNearbyFlags(x, y) >= countNearbyMines(x, y) && !allBombsFound(x, y)) {
+				gameOver();
+			}
 		}
 	}
 
