@@ -303,6 +303,71 @@ public class Display extends JPanel {
 
 		return nearbyMines;
 	}
+	
+	/**
+	 * For a specific tile, checks the surrounding tiles for flags and returns
+	 * the number of flags found.
+	 * 
+	 * @param x
+	 *            The x position of the specified tile.
+	 * @param y
+	 *            The y position of the specified tile.
+	 * @return The number of mines found.
+	 */
+	public int countNearbyFlags(int x, int y) {
+
+		int nearbyFlags = 0;
+
+		// check top
+		if (y > 0) {
+			if (board[x][y - 1] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		// check top-right
+		if (y > 0 && x < width - 1) {
+			if (board[x + 1][y - 1] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		// check right
+		if (x < width - 1) {
+			if (board[x + 1][y] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		// check bottom-right
+		if (x < width - 1 && y < height - 1) {
+			if (board[x + 1][y + 1] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		// check bottom
+		if (y < height - 1) {
+			if (board[x][y + 1] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		// check bottom-left
+		if (x > 0 && y < height - 1) {
+			if (board[x - 1][y + 1] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		// check left
+		if (x > 0) {
+			if (board[x - 1][y] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		// check top-left
+		if (x > 0 && y > 0) {
+			if (board[x - 1][y - 1] == FLAGTOKEN)
+				nearbyFlags++;
+		}
+
+		return nearbyFlags;
+	}
 
 	/**
 	 * A recursive function that takes a blank and then reveals all blanks
@@ -404,56 +469,56 @@ public class Display extends JPanel {
 
 		// check top
 		if (y > 0) {
-			if (board[x][y - 1] == MINETOKEN && revealed[x][y - 1] != -2) {
+			if (board[x][y - 1] == MINETOKEN && revealed[x][y - 1] != FLAGTOKEN) {
 				return false;
 			}
 		}
 
 		// check top-right
 		if (y > 0 && x < width - 1) {
-			if (board[x + 1][y - 1] == MINETOKEN && revealed[x + 1][y - 1] != -2) {
+			if (board[x + 1][y - 1] == MINETOKEN && revealed[x + 1][y - 1] != FLAGTOKEN) {
 				return false;
 			}
 		}
 
 		// check right
 		if (x < width - 1) {
-			if (board[x + 1][y] == MINETOKEN && revealed[x + 1][y] != -2) {
+			if (board[x + 1][y] == MINETOKEN && revealed[x + 1][y] != FLAGTOKEN) {
 				return false;
 			}
 		}
 
 		// check bottom-right
 		if (x < width - 1 && y < height - 1) {
-			if (board[x + 1][y + 1] == MINETOKEN && revealed[x + 1][y + 1] != -2) {
+			if (board[x + 1][y + 1] == MINETOKEN && revealed[x + 1][y + 1] != FLAGTOKEN) {
 				return false;
 			}
 		}
 
 		// check bottom
 		if (y < height - 1) {
-			if (board[x][y + 1] == MINETOKEN && revealed[x][y + 1] != -2) {
+			if (board[x][y + 1] == MINETOKEN && revealed[x][y + 1] != FLAGTOKEN) {
 				return false;
 			}
 		}
 
 		// check bottom-left
 		if (x > 0 && y < height - 1) {
-			if (board[x - 1][y + 1] == MINETOKEN && revealed[x - 1][y + 1] != -2) {
+			if (board[x - 1][y + 1] == MINETOKEN && revealed[x - 1][y + 1] != FLAGTOKEN) {
 				return false;
 			}
 		}
 
 		// check left
 		if (x > 0) {
-			if (board[x - 1][y] == MINETOKEN && revealed[x - 1][y] != -2) {
+			if (board[x - 1][y] == MINETOKEN && revealed[x - 1][y] != FLAGTOKEN) {
 				return false;
 			}
 		}
 
 		// check top-left
 		if (x > 0 && y > 0) {
-			if (board[x - 1][y - 1] == MINETOKEN && revealed[x - 1][y - 1] != -2) {
+			if (board[x - 1][y - 1] == MINETOKEN && revealed[x - 1][y - 1] != FLAGTOKEN) {
 				return false;
 			}
 		}
@@ -660,7 +725,7 @@ public class Display extends JPanel {
 	public void flag(int x, int y) {
 		if (revealed[x][y] == -1) {
 			revealed[x][y] = FLAGTOKEN;
-			flagsRemaining--;
+			flagsRemaining--;			
 		} else if (revealed[x][y] == FLAGTOKEN) {
 			revealed[x][y] = -1;
 			flagsRemaining++;
@@ -679,6 +744,8 @@ public class Display extends JPanel {
 		if (revealed[x][y] > 0 && allBombsFound(x, y)) {
 			revealSurrounding(x, y);
 			repaint();
+		} else {
+			// add checking for surrounding flags 
 		}
 	}
 
@@ -916,8 +983,7 @@ public class Display extends JPanel {
 					repaint();
 				}
 				
-				if (!gameOver) {
-					
+				if (!gameOver) {					
 					
 					if (SwingUtilities.isLeftMouseButton(e)) {
 						leftMousePressed = true;
@@ -975,6 +1041,10 @@ public class Display extends JPanel {
 						rightMousePressed = false;
 						if (inWindow(x, y))
 							flag(x, y);
+						if(allMinesFlagged()) {
+							revealAllTiles();
+							showWin();
+						}
 					}
 				}
 				repaint();
